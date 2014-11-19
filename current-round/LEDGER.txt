@@ -1,0 +1,8 @@
+Global Gitcoin ledger
+==============
+user-rkhtkvnn: 8
+user-bjrlo9eh: 4
+user-fyff2rcn: 17
+user-e7n2kays: 20
+user-emk6s4lf: 13
+user-95l5fub3: 3

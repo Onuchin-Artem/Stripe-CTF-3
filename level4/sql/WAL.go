@@ -1,0 +1,3 @@
+type WAL struct {
+	
+}

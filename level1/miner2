@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -eu
+
+
+export clone_spec=lvl1-ll3f5pap@stripe-ctf.com:level1
+export public_username=user-vjszxwuu
+
+prepare_index() {
+    perl -i -pe 's/($ENV{public_username}: )(\d+)/$1 . ($2+1)/e' LEDGER.txt
+    grep -q "$public_username" LEDGER.txt || echo "$public_username: 1" >> LEDGER.txt
+
+    git add LEDGER.txt
+}
+
+solve() {
+    # Brute force until you find something that's lexicographically
+    # small than $difficulty.
+    difficulty=$(cat difficulty.txt)
+
+    # Create a Git tree object reflecting our current working
+    # directory
+    tree=$(git write-tree)
+    parent=$(git rev-parse HEAD)
+    export CLASSPATH=$(find /home/aonuchin/Documents/stripe-ctf-3/level1/java-miner/ -path "*.jar" | xargs | sed 's/ /:/g')
+
+ 	sha1=$($JAVA_HOME/../jdk1.8.0-ea/bin/java  aonuchin.ctf.FuckGit $tree $parent 8 | git hash-object -t commit --stdin -w) 
+	git reset --hard "$sha1" > /dev/null
+}
+
+reset() {
+    git fetch origin master >/dev/null 2>/dev/null
+    git reset --hard origin/master >/dev/null
+}
+
+# Set up repo
+local_path=./${clone_spec##*:}
+
+if [ -d "$local_path" ]; then
+    echo "Using existing repository at $local_path"
+    cd "$local_path"
+else
+    echo "Cloning repository to $local_path"
+    git clone "$clone_spec" "$local_path"
+    cd "$local_path"
+fi
+
+pwd
+while true; do
+    prepare_index
+    solve
+    if git push origin master; then
+	echo "Success :)"
+    else
+	echo "Starting over :("
+	reset
+    fi
+done

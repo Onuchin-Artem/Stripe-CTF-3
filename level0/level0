@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+# Our test cases will always use the same dictionary file (with SHA1
+# 6b898d7c48630be05b72b3ae07c5be6617f90d8e). Running `test/harness`
+# will automatically download this dictionary for you if you don't
+# have it already.
+
+path = 'words-lower'
+ 
+entries_dict = {}
+File.read(path).each_line do |line|
+	entries_dict[line.rstrip] = 1
+end
+
+contents = $stdin.read
+
+contents.gsub!(/[^ \n]+/) do |word|
+ if entries_dict.has_key?(word.downcase)
+    word
+  else
+    "<#{word}>"
+  end
+end
+print contents
